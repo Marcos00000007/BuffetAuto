@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuffetAuto – Sistema de Gestão</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Overlay mobile -->
+  <div class="sidebar-overlay"></div>
+
+  <!-- ═══ SIDEBAR ═══════════════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">🍽️</div>
+        <div>
+          <div class="sidebar-logo-text">BuffetAuto</div>
+          <div class="sidebar-logo-sub">Gestão de Buffets</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Principal</div>
+      <div class="nav-item" data-page="dashboard">
+        <span class="nav-icon">🏠</span> Dashboard
+      </div>
+      <div class="nav-item" data-page="agenda">
+        <span class="nav-icon">📅</span> Agenda
+        <span class="nav-badge">3</span>
+      </div>
+
+      <div class="nav-section-label">Comercial</div>
+      <div class="nav-item" data-page="clientes">
+        <span class="nav-icon">👥</span> Clientes
+      </div>
+      <div class="nav-item" data-page="eventos">
+        <span class="nav-icon">🎉</span> Eventos
+      </div>
+      <div class="nav-item" data-page="orcamento">
+        <span class="nav-icon">💰</span> Novo Orçamento
+      </div>
+
+      <div class="nav-section-label">Operacional</div>
+      <div class="nav-item" data-page="estoque">
+        <span class="nav-icon">📦</span> Estoque
+        <span class="nav-badge">2</span>
+      </div>
+      <div class="nav-item" data-page="fornecedores">
+        <span class="nav-icon">🚚</span> Fornecedores
+      </div>
+
+      <div class="nav-section-label">Análise</div>
+      <div class="nav-item" data-page="relatorios">
+        <span class="nav-icon">📊</span> Relatórios
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">CM</div>
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name">Carla Mendes</div>
+          <div class="sidebar-user-role">Gestora de Eventos</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ ÁREA PRINCIPAL ════════════════════════════════════ -->
+  <div class="main-area">
+
+    <!-- Topbar -->
+    <header class="topbar">
+      <button class="hamburger" onclick="toggleSidebar()">☰</button>
+      <span class="topbar-title">Dashboard</span>
+      <div class="topbar-search">
+        <span class="topbar-search-icon">🔍</span>
+        <input type="text" placeholder="Buscar eventos, clientes…">
+      </div>
+      <div class="topbar-actions">
+        <button class="topbar-btn" title="Notificações" onclick="showToast('2 alertas de estoque pendentes')">
+          🔔<span class="notif-dot"></span>
+        </button>
+        <button class="topbar-btn" title="Ajuda" onclick="showToast('Central de ajuda em breve!')">❓</button>
+        <button class="btn btn-outline btn-sm" onclick="window.location.href='pages/login.html'">Sair</button>
+      </div>
+    </header>
+
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!--  PÁGINA: Dashboard                                       -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <div id="page-dashboard" class="page" style="display:none">
+      <div class="page-content">
+        <div class="page-header fade-up">
+          <h2>Olá, Carla 👋</h2>
+          <p>Aqui está um resumo da operação hoje, <strong>22 de maio de 2026</strong>.</p>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="stat-grid fade-up-2">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Eventos este mês</span>
+              <div class="stat-icon green">🎉</div>
+            </div>
+            <div class="stat-value">8</div>
+            <div class="stat-delta up">↑ 2 em relação ao mês anterior</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Faturamento previsto</span>
+              <div class="stat-icon gold">💰</div>
+            </div>
+            <div class="stat-value" style="font-size:1.5rem">R$ 145k</div>
+            <div class="stat-delta up">↑ 18% vs. mai/2025</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Novos clientes</span>
+              <div class="stat-icon blue">👥</div>
+            </div>
+            <div class="stat-value">12</div>
+            <div class="stat-delta up">↑ 3 esta semana</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <span class="stat-label">Alertas de estoque</span>
+              <div class="stat-icon red">📦</div>
+            </div>
+            <div class="stat-value">2</div>
+            <div class="stat-delta down">⚠ Salmão e Camarão em baixa</div>
+          </div>
+        </div>
+
+        <!-- Conteúdo grid -->
+        <div class="grid-2 fade-up-3">
+
+          <!-- Próximos eventos -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">📅 Próximos eventos</span>
+              <button class="btn btn-ghost btn-sm" onclick="navigate('eventos')">Ver todos →</button>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+              <div class="event-card">
+                <div class="event-date-box">
+                  <div class="event-date-day">14</div>
+                  <div class="event-date-month">Jun</div>
+                </div>
+                <div class="event-info">
+                  <div class="event-name">Casamento Silva &amp; Costa</div>
+                  <div class="event-meta">
+                    <span>📍 Espaço Villa Bella</span>
+                    <span>👥 180 convidados</span>
+                  </div>
+                  <div style="margin-top:6px">
+                    <span class="badge badge-success">Confirmado</span>
+                  </div>
+                </div>
+                <div class="event-actions">
+                  <button class="btn btn-outline btn-sm" onclick="showToast('OS gerada!')">📋 OS</button>
+                </div>
+              </div>
+              <div class="event-card">
+                <div class="event-date-box">
+                  <div class="event-date-day">22</div>
+                  <div class="event-date-month">Jun</div>
+                </div>
+                <div class="event-info">
+                  <div class="event-name">Formatura Medicina UFDF</div>
+                  <div class="event-meta">
+                    <span>📍 Hotel Nobile</span>
+                    <span>👥 320 convidados</span>
+                  </div>
+                  <div style="margin-top:6px">
+                    <span class="badge badge-warning">Aguardando assinatura</span>
+                  </div>
+                </div>
+                <div class="event-actions">
+                  <button class="btn btn-gold btn-sm" onclick="showToast('Contrato enviado!')">📄 Contrato</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alertas e ações rápidas -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="card">
+              <div class="card-header"><span class="card-title">⚠️ Alertas</span></div>
+              <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+                <div class="alert alert-warning">
+                  <span>📦</span>
+                  <div><strong>Estoque crítico:</strong> Salmão abaixo do mínimo (8 kg / mínimo 20 kg)</div>
+                </div>
+                <div class="alert alert-warning">
+                  <span>🦐</span>
+                  <div><strong>Estoque baixo:</strong> Camarão GG (12 kg / mínimo 15 kg)</div>
+                </div>
+                <div class="alert alert-info">
+                  <span>📄</span>
+                  <div><strong>Contrato pendente:</strong> Formatura UFDF aguarda assinatura digital</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header"><span class="card-title">⚡ Ações rápidas</span></div>
+              <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <button class="btn btn-primary" onclick="navigate('orcamento')">💰 Novo Orçamento</button>
+                <button class="btn btn-outline" onclick="navigate('clientes')">👤 Novo Cliente</button>
+                <button class="btn btn-outline" onclick="navigate('eventos')">🎉 Novo Evento</button>
+                <button class="btn btn-outline" onclick="navigate('relatorios')">📊 Relatórios</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Faturamento mensal -->
+        <div class="card fade-up-4" style="margin-top:20px">
+          <div class="card-header">
+            <span class="card-title">📈 Faturamento — últimos 6 meses</span>
+            <div class="flex gap-2">
+              <button class="btn btn-ghost btn-sm">Ano</button>
+              <button class="btn btn-outline btn-sm">Semestre</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div style="display:flex;gap:6px;align-items:flex-end;height:100px">
+              <!-- Barras simples como visual -->
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="background:var(--green-200);border-radius:4px 4px 0 0;width:100%;height:52px"></div>
+                <span style="font-size:.7rem;color:var(--text-muted)">Dez</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="background:var(--green-200);border-radius:4px 4px 0 0;width:100%;height:68px"></div>
+                <span style="font-size:.7rem;color:var(--text-muted)">Jan</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="background:var(--green-200);border-radius:4px 4px 0 0;width:100%;height:45px"></div>
+                <span style="font-size:.7rem;color:var(--text-muted)">Fev</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="background:var(--green-200);border-radius:4px 4px 0 0;width:100%;height:78px"></div>
+                <span style="font-size:.7rem;color:var(--text-muted)">Mar</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="background:var(--green-200);border-radius:4px 4px 0 0;width:100%;height:60px"></div>
+                <span style="font-size:.7rem;color:var(--text-muted)">Abr</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+                <div style="background:var(--green-700);border-radius:4px 4px 0 0;width:100%;height:100px;position:relative">
+                  <span style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:.7rem;font-weight:600;color:var(--green-700);white-space:nowrap">R$145k</span>
+                </div>
+                <span style="font-size:.7rem;color:var(--text-muted);font-weight:600">Mai</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!--  PÁGINA: Eventos                                         -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <div id="page-eventos" class="page" style="display:none">
+      <div class="page-content">
+        <div class="page-header fade-up flex justify-between items-center">
+          <div>
+            <h2>Gestão de Eventos</h2>
+            <p>Gerencie todos os eventos cadastrados no sistema</p>
+          </div>
+          <button class="btn btn-primary" onclick="showToast('Formulário de novo evento aberto!')">+ Novo Evento</button>
+        </div>
+
+        <div class="card fade-up-2">
+          <div class="card-header">
+            <div class="flex gap-2">
+              <input id="search-eventos" type="text" class="form-control" placeholder="🔍 Buscar evento…" style="width:260px">
+              <select class="form-control" style="width:160px" onchange="showToast('Filtro aplicado!')">
+                <option>Todos os status</option>
+                <option>Confirmado</option>
+                <option>Aguardando</option>
+                <option>Proposta</option>
+                <option>Cancelado</option>
+              </select>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn btn-outline btn-sm" onclick="showToast('Exportando CSV…')">⬇ Exportar</button>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Evento</th>
+                  <th>Data</th>
+                  <th>Local</th>
+                  <th>Convidados</th>
+                  <th>Valor</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="eventos-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!--  PÁGINA: Clientes                                        -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <div id="page-clientes" class="page" style="display:none">
+      <div class="page-content">
+        <div class="page-header fade-up flex justify-between items-center">
+          <div>
+            <h2>Clientes</h2>
+            <p>Cadastro e histórico de clientes do buffet</p>
+          </div>
+          <button class="btn btn-primary" onclick="showToast('Formulário de cadastro aberto!')">+ Novo Cliente</button>
+        </div>
+
+        <div class="card fade-up-2">
+          <div class="card-header">
+            <input id="search-clientes" type="text" class="form-control" placeholder="🔍 Buscar cliente…" style="width:260px">
+            <button class="btn btn-outline btn-sm" onclick="showToast('Exportando…')">⬇ Exportar</button>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Telefone</th>
+                  <th>Tipo de evento</th>
+                  <th>Histórico</th>
+                  <th>Último evento</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="clientes-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!--  PÁGINA: Orçamento                                       -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <div id="page-orcamento" class="page" style="display:none">
+      <div class="page-content">
+        <div class="page-header fade-up">
+          <h2>Gerar Orçamento</h2>
+          <p>Preencha os dados do evento para gerar uma proposta comercial automaticamente</p>
+        </div>
+
+        <div class="grid-2 fade-up-2">
+          <!-- Formulário -->
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div class="card">
+              <div class="card-header"><span class="card-title">📋 Dados do Cliente</span></div>
+              <div class="card-body">
+                <div class="form-grid" style="gap:14px">
+                  <div class="form-group">
+                    <label class="form-label">Nome do cliente <span>*</span></label>
+                    <input id="orc-nome" type="text" class="form-control" placeholder="Ex: Ana Silva">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Telefone</label>
+                    <input type="text" class="form-control" placeholder="(61) 99999-9999">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">E-mail</label>
+                    <input type="email" class="form-control" placeholder="cliente@email.com">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header"><span class="card-title">🎉 Dados do Evento</span></div>
+              <div class="card-body">
+                <div class="form-grid form-grid-2" style="gap:14px">
+                  <div class="form-group">
+                    <label class="form-label">Tipo de evento <span>*</span></label>
+                    <select class="form-control">
+                      <option value="">Selecione</option>
+                      <option>Casamento</option>
+                      <option>Formatura</option>
+                      <option>Aniversário</option>
+                      <option>Corporativo</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Data do evento <span>*</span></label>
+                    <input type="date" class="form-control">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Nº de convidados <span>*</span></label>
+                    <input id="orc-convidados" type="number" class="form-control" placeholder="Ex: 150" min="1">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Local do evento</label>
+                    <input type="text" class="form-control" placeholder="Ex: Espaço Villa Bella">
+                  </div>
+                  <div class="form-group" style="grid-column:1/-1">
+                    <label class="form-label">Cardápio <span>*</span></label>
+                    <select id="orc-cardapio" class="form-control">
+                      <option value="">Selecione o pacote</option>
+                      <option value="basico">Básico — R$ 180/pessoa</option>
+                      <option value="standard">Standard — R$ 260/pessoa</option>
+                      <option value="premium">Premium — R$ 380/pessoa</option>
+                      <option value="gourmet">Gourmet — R$ 520/pessoa</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="grid-column:1/-1">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                      <input id="orc-extra" type="checkbox" style="width:16px;height:16px;accent-color:var(--green-700)">
+                      <span class="form-label" style="margin:0">Incluir decoração e estrutura (+15%)</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" style="padding:12px;justify-content:center;font-size:.95rem" onclick="calcularOrcamento()">
+              ✨ Gerar Orçamento Automaticamente
+            </button>
+          </div>
+
+          <!-- Resultado -->
+          <div>
+            <div id="orc-result" style="display:none"></div>
+            <div class="card fade-up-3" style="background:var(--green-900);border:none;color:#fff" id="orc-info">
+              <div class="card-body">
+                <h3 style="color:var(--gold-300);margin-bottom:12px">Como funciona</h3>
+                <div style="display:flex;flex-direction:column;gap:16px">
+                  <div class="flex gap-3">
+                    <div style="width:32px;height:32px;background:rgba(192,156,74,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+                    <div>
+                      <div style="font-weight:600;font-size:.9rem;color:#fff">Preencha os dados</div>
+                      <div style="font-size:.82rem;color:rgba(255,255,255,.5)">Tipo de evento, convidados e cardápio</div>
+                    </div>
+                  </div>
+                  <div class="flex gap-3">
+                    <div style="width:32px;height:32px;background:rgba(192,156,74,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+                    <div>
+                      <div style="font-weight:600;font-size:.9rem;color:#fff">Gere o orçamento</div>
+                      <div style="font-size:.82rem;color:rgba(255,255,255,.5)">O sistema calcula custo, margem e totais</div>
+                    </div>
+                  </div>
+                  <div class="flex gap-3">
+                    <div style="width:32px;height:32px;background:rgba(192,156,74,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+                    <div>
+                      <div style="font-weight:600;font-size:.9rem;color:#fff">Envie ao cliente</div>
+                      <div style="font-size:.82rem;color:rgba(255,255,255,.5)">Proposta em PDF pronta para envio</div>
+                    </div>
+                  </div>
+                  <div class="flex gap-3">
+                    <div style="width:32px;height:32px;background:rgba(192,156,74,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+                    <div>
+                      <div style="font-weight:600;font-size:.9rem;color:#fff">Gere o contrato</div>
+                      <div style="font-size:.82rem;color:rgba(255,255,255,.5)">Contrato para assinatura digital via FlowSign</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!--  PÁGINA: Estoque                                         -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <div id="page-estoque" class="page" style="display:none">
+      <div class="page-content">
+        <div class="page-header fade-up flex justify-between items-center">
+          <div>
+            <h2>Controle de Estoque</h2>
+            <p>Monitore entradas e saídas de ingredientes</p>
+          </div>
+          <button class="btn btn-primary" onclick="showToast('Entrada registrada!')">+ Registrar Entrada</button>
+        </div>
+
+        <div class="alert alert-warning fade-up-2" style="margin-bottom:20px">
+          ⚠️ <strong>2 ingredientes</strong> abaixo do estoque mínimo. Considere fazer pedidos aos fornecedores.
+        </div>
+
+        <div class="card fade-up-3">
+          <div class="card-header">
+            <input id="search-estoque" type="text" class="form-control" placeholder="🔍 Buscar ingrediente…" style="width:260px">
+            <div class="flex gap-2">
+              <button class="btn btn-outline btn-sm" onclick="showToast('Gerando lista de compras…')">📋 Gerar Lista de Compras</button>
+            </div>
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ingrediente</th>
+                  <th>Quantidade atual</th>
+                  <th>Estoque mínimo</th>
+                  <th>Nível</th>
+                  <th>Fornecedor</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="estoque-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!--  PÁGINA: Fornecedores                                    -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <div id="page-fornecedores" class="page" style="display:none">
+      <div class="page-content">
+        <div class="page-header fade-up flex justify-between items-center">
+          <div>
+            <h2>Fornecedores</h2>
+            <p>Gerencie sua rede de fornecedores de insumos e materiais</p>
+          </div>
+          <button class="btn btn-primary" onclick="showToast('Formulário aberto!')">+ Novo Fornecedor</button>
+        </div>
+        <div id="fornecedores-container" class="grid-2 fade-up-2"></div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!--  PÁGINA: Agenda                                          -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <div id="page-agenda" class="page" style="display:none">
+      <div class="page-content">
+        <div class="page-header fade-up">
+          <h2>Agenda de Eventos</h2>
+          <p>Visualize e gerencie sua agenda de eventos</p>
+        </div>
+
+        <div class="grid-2 fade-up-2">
+          <!-- Calendário -->
+          <div class="card">
+            <div class="card-body">
+              <div class="calendar-header">
+                <button class="btn btn-ghost btn-icon" onclick="showToast('Mês anterior')">‹</button>
+                <h3 style="font-family:'Cormorant Garamond',serif">Junho 2026</h3>
+                <button class="btn btn-ghost btn-icon" onclick="showToast('Próximo mês')">›</button>
+              </div>
+              <div class="calendar-grid">
+                <div class="cal-day-label">Dom</div>
+                <div class="cal-day-label">Seg</div>
+                <div class="cal-day-label">Ter</div>
+                <div class="cal-day-label">Qua</div>
+                <div class="cal-day-label">Qui</div>
+                <div class="cal-day-label">Sex</div>
+                <div class="cal-day-label">Sáb</div>
+                <!-- Semana 1 -->
+                <div class="cal-day other-month">25</div>
+                <div class="cal-day other-month">26</div>
+                <div class="cal-day other-month">27</div>
+                <div class="cal-day other-month">28</div>
+                <div class="cal-day other-month">29</div>
+                <div class="cal-day other-month">30</div>
+                <div class="cal-day other-month">31</div>
+                <!-- Semana 2 -->
+                <div class="cal-day">1</div>
+                <div class="cal-day">2</div>
+                <div class="cal-day">3</div>
+                <div class="cal-day">4</div>
+                <div class="cal-day">5</div>
+                <div class="cal-day">6</div>
+                <div class="cal-day">7</div>
+                <!-- Semana 3 -->
+                <div class="cal-day">8</div>
+                <div class="cal-day">9</div>
+                <div class="cal-day">10</div>
+                <div class="cal-day">11</div>
+                <div class="cal-day">12</div>
+                <div class="cal-day">13</div>
+                <div class="cal-day has-event">14</div>
+                <!-- Semana 4 -->
+                <div class="cal-day">15</div>
+                <div class="cal-day">16</div>
+                <div class="cal-day">17</div>
+                <div class="cal-day">18</div>
+                <div class="cal-day">19</div>
+                <div class="cal-day">20</div>
+                <div class="cal-day">21</div>
+                <!-- Semana 5 -->
+                <div class="cal-day today has-event">22</div>
+                <div class="cal-day">23</div>
+                <div class="cal-day">24</div>
+                <div class="cal-day">25</div>
+                <div class="cal-day">26</div>
+                <div class="cal-day">27</div>
+                <div class="cal-day">28</div>
+                <!-- Semana 6 -->
+                <div class="cal-day">29</div>
+                <div class="cal-day">30</div>
+                <div class="cal-day other-month">1</div>
+                <div class="cal-day other-month">2</div>
+                <div class="cal-day other-month">3</div>
+                <div class="cal-day other-month">4</div>
+                <div class="cal-day other-month">5</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:14px;font-size:.75rem;color:var(--text-muted)">
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--gold-500);display:inline-block"></span>Evento agendado</span>
+                <span style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:var(--green-700);display:inline-block"></span>Hoje</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lista de eventos do mês -->
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <h4 style="font-family:'Cormorant Garamond',serif">Eventos em Junho</h4>
+            <div class="event-card">
+              <div class="event-date-box">
+                <div class="event-date-day">14</div>
+                <div class="event-date-month">Jun</div>
+              </div>
+              <div class="event-info">
+                <div class="event-name">Casamento Silva &amp; Costa</div>
+                <div class="event-meta">
+                  <span>📍 Espaço Villa Bella</span>
+                  <span>👥 180 convidados</span>
+                  <span>💰 R$ 28.400</span>
+                </div>
+                <div style="margin-top:6px"><span class="badge badge-success">Confirmado</span></div>
+              </div>
+            </div>
+            <div class="event-card">
+              <div class="event-date-box">
+                <div class="event-date-day">22</div>
+                <div class="event-date-month">Jun</div>
+              </div>
+              <div class="event-info">
+                <div class="event-name">Formatura Medicina UFDF</div>
+                <div class="event-meta">
+                  <span>📍 Hotel Nobile</span>
+                  <span>👥 320 convidados</span>
+                  <span>💰 R$ 52.000</span>
+                </div>
+                <div style="margin-top:6px"><span class="badge badge-warning">Aguardando</span></div>
+              </div>
+            </div>
+            <div style="padding:12px 16px;background:var(--surface-alt);border-radius:var(--radius-sm)">
+              <div style="font-size:.8rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Julho</div>
+              <div class="event-meta">
+                <span>5 Jul — Aniversário Dr. Paulo (90 conv.)</span>
+              </div>
+              <div class="event-meta" style="margin-top:4px">
+                <span>18 Jul — Confraternização Tech Corp (200 conv.)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────── -->
+    <!--  PÁGINA: Relatórios                                      -->
+    <!-- ─────────────────────────────────────────────────────── -->
+    <div id="page-relatorios" class="page" style="display:none">
+      <div class="page-content">
+        <div class="page-header fade-up">
+          <h2>Relatórios</h2>
+          <p>Análises financeiras e operacionais do buffet</p>
+        </div>
+
+        <div class="tabs fade-up-2">
+          <div class="tab active" onclick="switchTab(this,'tab-financeiro')">💰 Financeiro</div>
+          <div class="tab" onclick="switchTab(this,'tab-operacional')">⚙️ Operacional</div>
+        </div>
+
+        <!-- Tab financeiro -->
+        <div id="tab-financeiro" class="fade-up-3">
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Faturamento Anual</span>
+                <div class="stat-icon gold">💰</div>
+              </div>
+              <div class="stat-value" style="font-size:1.6rem">R$ 1,2M</div>
+              <div class="stat-delta up">↑ 24% vs. 2025</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Ticket Médio</span>
+                <div class="stat-icon green">🎫</div>
+              </div>
+              <div class="stat-value" style="font-size:1.6rem">R$ 32k</div>
+              <div class="stat-delta up">↑ 8% vs. 2025</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Margem Média</span>
+                <div class="stat-icon blue">📈</div>
+              </div>
+              <div class="stat-value">38%</div>
+              <div class="stat-delta up">↑ 3pp vs. 2025</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Eventos no Ano</span>
+                <div class="stat-icon red">🎉</div>
+              </div>
+              <div class="stat-value">37</div>
+              <div class="stat-delta up">↑ 5 vs. 2025</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:4px">
+            <div class="card-header">
+              <span class="card-title">Faturamento por tipo de evento</span>
+              <button class="btn btn-outline btn-sm" onclick="showToast('Exportando relatório…')">⬇ Exportar PDF</button>
+            </div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:14px">
+                <div>
+                  <div class="flex justify-between text-sm" style="margin-bottom:5px">
+                    <span>Casamentos</span><strong>R$ 520.000 (43%)</strong>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill" style="width:43%"></div></div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm" style="margin-bottom:5px">
+                    <span>Corporativos</span><strong>R$ 360.000 (30%)</strong>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill" style="width:30%"></div></div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm" style="margin-bottom:5px">
+                    <span>Formaturas</span><strong>R$ 200.000 (17%)</strong>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill" style="width:17%"></div></div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm" style="margin-bottom:5px">
+                    <span>Aniversários</span><strong>R$ 120.000 (10%)</strong>
+                  </div>
+                  <div class="progress-bar"><div class="progress-fill gold" style="width:10%"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab operacional -->
+        <div id="tab-operacional" style="display:none" class="fade-up-3">
+          <div class="stat-grid">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">OS geradas</span>
+                <div class="stat-icon green">📋</div>
+              </div>
+              <div class="stat-value">37</div>
+              <div class="stat-delta up">100% automatizadas</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Contratos digitais</span>
+                <div class="stat-icon gold">✍️</div>
+              </div>
+              <div class="stat-value">34</div>
+              <div class="stat-delta up">92% assinados digitalmente</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Tempo médio por orçamento</span>
+                <div class="stat-icon blue">⏱</div>
+              </div>
+              <div class="stat-value">2min</div>
+              <div class="stat-delta up">↓ de 3h para 2min</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <span class="stat-label">Erros operacionais</span>
+                <div class="stat-icon red">⚠️</div>
+              </div>
+              <div class="stat-value">0</div>
+              <div class="stat-delta up">↓ 100% vs. período anterior</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- fim páginas -->
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+function switchTab(el, tabId) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-financeiro').style.display = 'none';
+  document.getElementById('tab-operacional').style.display = 'none';
+  document.getElementById(tabId).style.display = 'block';
+}
+</script>
+</body>
+</html>
