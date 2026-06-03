@@ -807,3 +807,104 @@ textarea.form-control { resize: vertical; min-height: 90px; }
   .login-art { display: none; }
   .login-form-side { width: 100%; }
 }
+
+/* ─── Modal ──────────────────────────────────────────────── */
+#app-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.48);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+}
+.modal-box {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 640px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  animation: fadeUp .25s ease;
+}
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.modal-header h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  color: var(--text-primary);
+}
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background var(--transition);
+  line-height: 1;
+}
+.modal-close:hover { background: var(--bg); color: var(--text-primary); }
+#modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+#modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+  background: var(--bg);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+/* ─── Nav badge (atualização) ────────────────────────────── */
+.nav-badge[style*="display: none"] { display: none !important; }
+
+/* ─── Estoque alert banner ───────────────────────────────── */
+#estoque-alert-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+/* ─── Fornecedor card hover ──────────────────────────────── */
+#fornecedores-container .card {
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+#fornecedores-container .card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* ─── Tabs (fix active bottom border) ───────────────────── */
+.tabs {
+  margin-bottom: 20px;
+}
+
+/* ─── Responsive modal ───────────────────────────────────── */
+@media (max-width: 640px) {
+  #app-modal { padding: 10px; align-items: flex-end; }
+  .modal-box { max-height: 95vh; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+}
+
+/* ─── Print (OS / Contrato) ──────────────────────────────── */
+@media print {
+  .sidebar, .topbar, #app-modal > div > div:last-child { display: none !important; }
+  .main-area { margin-left: 0; }
+  #modal-body { max-height: none !important; overflow: visible !important; }
+}

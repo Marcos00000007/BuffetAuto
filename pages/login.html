@@ -3,80 +3,756 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BuffetAuto – Login</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <title>BuffetAuto – Acesso</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* ── Telas ─────────────────────────────────────── */
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100%;
+      animation: screenIn .35s ease both;
+    }
+    .screen.active { display: flex; }
+
+    @keyframes screenIn {
+      from { opacity: 0; transform: translateX(24px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes screenOut {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(-24px); }
+    }
+    .screen.leaving {
+      display: flex;
+      animation: screenOut .25s ease forwards;
+    }
+
+    /* ── Arte lateral dinâmica ──────────────────────── */
+    .login-art { transition: background .5s ease; }
+
+    /* ── Painel de cadastro – etapas ────────────────── */
+    .step-bar {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 28px;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    .step-circle {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: var(--surface);
+      transition: all .3s ease;
+      flex-shrink: 0;
+    }
+    .step-circle.done  { background: var(--green-700); border-color: var(--green-700); color: #fff; }
+    .step-circle.active{ background: var(--gold-500);  border-color: var(--gold-500);  color: #fff; }
+    .step-label {
+      font-size: .72rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .step-label.active { color: var(--gold-500); font-weight: 600; }
+    .step-label.done   { color: var(--green-700); }
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      margin: 0 8px;
+      border-radius: 1px;
+      transition: background .4s ease;
+    }
+    .step-line.done { background: var(--green-700); }
+
+    /* ── Campos de form do cadastro ─────────────────── */
+    .cad-step { display: none; }
+    .cad-step.active { display: block; animation: screenIn .3s ease both; }
+
+    /* ── Sucesso ────────────────────────────────────── */
+    .success-icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--green-100);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem;
+      margin: 0 auto 16px;
+      animation: popIn .4s cubic-bezier(.175,.885,.32,1.275) both;
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+
+    /* ── Senha – força ──────────────────────────────── */
+    .pwd-strength {
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .pwd-strength-fill {
+      height: 100%;
+      border-radius: 2px;
+      width: 0%;
+      transition: width .3s ease, background .3s ease;
+    }
+    .pwd-hint { font-size: .72rem; margin-top: 4px; }
+
+    /* ── Toggle senha ───────────────────────────────── */
+    .pwd-wrap { position: relative; }
+    .pwd-wrap input { padding-right: 40px; }
+    .pwd-toggle {
+      position: absolute;
+      right: 10px; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      cursor: pointer; font-size: .95rem;
+      color: var(--text-muted);
+      padding: 4px;
+    }
+
+    /* ── Checkbox termos ────────────────────────────── */
+    .terms-check {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+      font-size: .82rem;
+      color: var(--text-secondary);
+    }
+    .terms-check input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: var(--green-700);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ── Arte lateral – conteúdo por tela ───────────── */
+    .art-slide { display: none; }
+    .art-slide.active { display: block; animation: screenIn .4s ease both; }
+
+    /* ── Contador regressivo ────────────────────────── */
+    #redirect-count {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--green-700);
+      display: block;
+      text-align: center;
+      margin: 8px 0 4px;
+    }
+  </style>
 </head>
 <body>
-<div class="login-page">
+<div class="login-page" id="login-page">
 
-  <!-- Arte lateral -->
-  <div class="login-art">
+  <!-- ═══ ARTE LATERAL ═══════════════════════════════════ -->
+  <div class="login-art" id="login-art">
     <div class="login-art-pattern"></div>
-    <div class="login-art-content fade-up">
-      <h1>Gestão inteligente para<br><em>buffets de alto padrão</em></h1>
-      <p>Automatize orçamentos, contratos e ordens de serviço em segundos. Foque no que realmente importa: encantar seus clientes.</p>
-      <div class="login-features">
-        <div class="login-feature">
-          <div class="login-feature-icon">📄</div>
-          <span>Documentos gerados automaticamente em segundos</span>
+
+    <!-- Arte: Login -->
+    <div class="art-slide active" id="art-login">
+      <div class="login-art-content">
+        <h1>Gestão inteligente para<br><em>buffets de alto padrão</em></h1>
+        <p>Automatize orçamentos, contratos e ordens de serviço em segundos. Foque no que realmente importa: encantar seus clientes.</p>
+        <div class="login-features">
+          <div class="login-feature"><div class="login-feature-icon">📄</div><span>Documentos gerados automaticamente</span></div>
+          <div class="login-feature"><div class="login-feature-icon">🧮</div><span>Cálculo preciso de porções e custos</span></div>
+          <div class="login-feature"><div class="login-feature-icon">📊</div><span>Relatórios financeiros em tempo real</span></div>
+          <div class="login-feature"><div class="login-feature-icon">🔒</div><span>Dados protegidos — conformidade LGPD</span></div>
         </div>
-        <div class="login-feature">
-          <div class="login-feature-icon">🧮</div>
-          <span>Cálculo preciso de porções e custos por evento</span>
+      </div>
+    </div>
+
+    <!-- Arte: Cadastro -->
+    <div class="art-slide" id="art-cadastro">
+      <div class="login-art-content">
+        <h1>Crie sua conta<br><em>em minutos</em></h1>
+        <p>Junte-se a mais de 280 buffets que já automatizaram sua gestão com o BuffetAuto.</p>
+        <div class="login-features">
+          <div class="login-feature"><div class="login-feature-icon">🚀</div><span>Configure seu buffet em menos de 5 minutos</span></div>
+          <div class="login-feature"><div class="login-feature-icon">🆓</div><span>14 dias grátis — sem cartão de crédito</span></div>
+          <div class="login-feature"><div class="login-feature-icon">🤝</div><span>Suporte humano incluído no plano</span></div>
+          <div class="login-feature"><div class="login-feature-icon">🔄</div><span>Migração dos seus dados sem custo</span></div>
         </div>
-        <div class="login-feature">
-          <div class="login-feature-icon">📊</div>
-          <span>Relatórios financeiros e operacionais em tempo real</span>
+        <div style="margin-top:32px;padding:16px 20px;background:rgba(192,156,74,.15);border-radius:12px;border-left:3px solid var(--gold-500)">
+          <div style="font-size:.8rem;color:var(--gold-300);font-weight:600;margin-bottom:6px">🌟 DEPOIMENTO</div>
+          <div style="font-size:.88rem;color:rgba(255,255,255,.8);line-height:1.5;">"Reduzi o tempo de elaboração de orçamentos de 3 horas para menos de 2 minutos."</div>
+          <div style="font-size:.75rem;color:rgba(255,255,255,.4);margin-top:8px">— Carla M., Buffet Villa Rosa · Brasília/DF</div>
         </div>
-        <div class="login-feature">
-          <div class="login-feature-icon">🔒</div>
-          <span>Dados protegidos com conformidade à LGPD</span>
+      </div>
+    </div>
+
+    <!-- Arte: Sucesso -->
+    <div class="art-slide" id="art-sucesso">
+      <div class="login-art-content">
+        <h1>Tudo pronto,<br><em>seja bem-vindo!</em></h1>
+        <p>Sua conta foi criada com sucesso. Você será redirecionado para o login automaticamente.</p>
+        <div class="login-features" style="margin-top:32px">
+          <div class="login-feature"><div class="login-feature-icon">✅</div><span>Conta corporativa criada</span></div>
+          <div class="login-feature"><div class="login-feature-icon">📧</div><span>E-mail de boas-vindas enviado</span></div>
+          <div class="login-feature"><div class="login-feature-icon">🎁</div><span>14 dias de trial ativados</span></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Formulário -->
+  <!-- ═══ LADO DO FORMULÁRIO ══════════════════════════════ -->
   <div class="login-form-side">
-    <div class="login-form-box fade-up">
-      <div class="login-form-logo">
-        <div class="login-form-logo-icon">🍽️</div>
-        <span class="login-form-logo-name">BuffetAuto</span>
+
+    <!-- ── TELA 1: LOGIN ─────────────────────────────────── -->
+    <div class="screen active" id="screen-login">
+      <div class="login-form-box">
+        <div class="login-form-logo">
+          <div class="login-form-logo-icon">🍽️</div>
+          <span class="login-form-logo-name">BuffetAuto</span>
+        </div>
+
+        <h2>Bem-vindo de volta</h2>
+        <p>Acesse sua conta para continuar</p>
+
+        <div class="form-group" style="margin-top:24px">
+          <label class="form-label">E-mail <span>*</span></label>
+          <input id="login-email" type="email" class="form-control" placeholder="seu@email.com" value="gestor@buffetauto.com.br">
+        </div>
+
+        <div class="form-group" style="margin-top:14px">
+          <label class="form-label">Senha <span>*</span></label>
+          <div class="pwd-wrap">
+            <input id="login-senha" type="password" class="form-control" placeholder="••••••••" value="12345678">
+            <button class="pwd-toggle" type="button" onclick="togglePwd('login-senha',this)">👁️</button>
+          </div>
+        </div>
+
+        <p class="login-forgot"><a href="#" onclick="mostrarEsqueciSenha(event)">Esqueci minha senha</a></p>
+
+        <div id="login-erro" style="display:none" class="alert alert-warning" style="margin-top:12px"></div>
+
+        <button class="btn btn-primary login-submit" style="margin-top:20px" onclick="tentarLogin()">
+          Entrar no sistema
+        </button>
+
+        <div class="login-divider" style="margin-top:24px">ou</div>
+
+        <div style="margin-top:4px">
+          <button class="btn btn-outline w-full" style="justify-content:center;gap:8px;font-size:.85rem"
+            onclick="irParaCadastro()">
+            🏢 Cadastrar empresa no sistema
+          </button>
+        </div>
+
+        <p style="text-align:center;font-size:.73rem;color:var(--text-muted);margin-top:24px;line-height:1.5">
+          Ao acessar, você concorda com nossa
+          <a href="#" style="color:var(--green-500)">Política de Privacidade</a> e os
+          <a href="#" style="color:var(--green-500)">Termos de Uso</a>.
+        </p>
       </div>
+    </div>
 
-      <h2>Bem-vindo de volta</h2>
-      <p>Acesse sua conta para continuar</p>
+    <!-- ── TELA 2: CADASTRO CORPORATIVO ──────────────────── -->
+    <div class="screen" id="screen-cadastro">
+      <div class="login-form-box" style="max-width:380px">
 
-      <div class="form-group" style="margin-top:24px">
-        <label class="form-label">E-mail <span>*</span></label>
-        <input type="email" class="form-control" placeholder="seu@email.com" value="gestor@buffetauto.com.br">
+        <!-- Voltar -->
+        <button onclick="irParaLogin()" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:.82rem;display:flex;align-items:center;gap:6px;padding:0;margin-bottom:20px">
+          ← Voltar ao login
+        </button>
+
+        <div class="login-form-logo">
+          <div class="login-form-logo-icon">🏢</div>
+          <span class="login-form-logo-name" style="font-size:1.2rem">Cadastro Corporativo</span>
+        </div>
+        <p style="margin-bottom:24px;font-size:.85rem">Preencha os dados da sua empresa para criar a conta.</p>
+
+        <!-- Barra de etapas -->
+        <div class="step-bar">
+          <div class="step">
+            <div class="step-circle active" id="step-c1">1</div>
+            <span class="step-label active" id="step-l1">Empresa</span>
+          </div>
+          <div class="step-line" id="step-line-1"></div>
+          <div class="step">
+            <div class="step-circle" id="step-c2">2</div>
+            <span class="step-label" id="step-l2">Responsável</span>
+          </div>
+          <div class="step-line" id="step-line-2"></div>
+          <div class="step">
+            <div class="step-circle" id="step-c3">3</div>
+            <span class="step-label" id="step-l3">Acesso</span>
+          </div>
+        </div>
+
+        <!-- Etapa 1: Dados da empresa -->
+        <div class="cad-step active" id="cad-step-1">
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">Razão social / Nome do buffet <span>*</span></label>
+            <input id="cad-empresa" class="form-control" placeholder="Ex: Buffet Villa Rosa Ltda">
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">CNPJ <span>*</span></label>
+            <input id="cad-cnpj" class="form-control" placeholder="00.000.000/0001-00" maxlength="18"
+              oninput="this.value=maskCNPJ(this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">Cidade / Estado <span>*</span></label>
+            <input id="cad-cidade" class="form-control" placeholder="Ex: Brasília / DF">
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label class="form-label">Segmento principal</label>
+            <select id="cad-segmento" class="form-control">
+              <option value="">Selecione</option>
+              <option>Casamentos</option>
+              <option>Eventos Corporativos</option>
+              <option>Formaturas</option>
+              <option>Buffet Completo (todos os tipos)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary w-full" style="justify-content:center" onclick="avancarEtapa(2)">
+            Próximo — Dados do responsável →
+          </button>
+        </div>
+
+        <!-- Etapa 2: Dados do responsável -->
+        <div class="cad-step" id="cad-step-2">
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">Nome completo <span>*</span></label>
+            <input id="cad-nome" class="form-control" placeholder="Ex: Carla Mendes">
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">CPF <span>*</span></label>
+            <input id="cad-cpf" class="form-control" placeholder="000.000.000-00" maxlength="14"
+              oninput="this.value=maskCPF(this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">Telefone / WhatsApp <span>*</span></label>
+            <input id="cad-tel" class="form-control" placeholder="(61) 99999-9999" maxlength="15"
+              oninput="this.value=maskTel(this.value)">
+          </div>
+          <div class="form-group" style="margin-bottom:20px">
+            <label class="form-label">Cargo</label>
+            <select id="cad-cargo" class="form-control">
+              <option>Proprietário(a)</option>
+              <option>Gestor(a) de Eventos</option>
+              <option>Diretor(a)</option>
+              <option>Sócio(a)</option>
+            </select>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="voltarEtapa(1)">← Voltar</button>
+            <button class="btn btn-primary" style="flex:2;justify-content:center" onclick="avancarEtapa(3)">Próximo — Criar acesso →</button>
+          </div>
+        </div>
+
+        <!-- Etapa 3: Dados de acesso -->
+        <div class="cad-step" id="cad-step-3">
+          <div class="form-group" style="margin-bottom:14px">
+            <label class="form-label">E-mail de acesso <span>*</span></label>
+            <input id="cad-email" type="email" class="form-control" placeholder="gestor@seuBuffet.com.br">
+          </div>
+          <div class="form-group" style="margin-bottom:4px">
+            <label class="form-label">Senha <span>*</span></label>
+            <div class="pwd-wrap">
+              <input id="cad-senha" type="password" class="form-control" placeholder="Mín. 8 caracteres"
+                oninput="avaliarSenha(this.value)">
+              <button class="pwd-toggle" type="button" onclick="togglePwd('cad-senha',this)">👁️</button>
+            </div>
+            <div class="pwd-strength"><div class="pwd-strength-fill" id="pwd-fill"></div></div>
+            <p class="pwd-hint text-muted" id="pwd-hint">Digite a senha para ver a força</p>
+          </div>
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">Confirmar senha <span>*</span></label>
+            <div class="pwd-wrap">
+              <input id="cad-senha2" type="password" class="form-control" placeholder="Repita a senha">
+              <button class="pwd-toggle" type="button" onclick="togglePwd('cad-senha2',this)">👁️</button>
+            </div>
+          </div>
+          <label class="terms-check" style="margin-bottom:20px">
+            <input type="checkbox" id="cad-termos">
+            <span>Li e concordo com os <a href="#" style="color:var(--green-500)">Termos de Uso</a> e a <a href="#" style="color:var(--green-500)">Política de Privacidade</a> do BuffetAuto.</span>
+          </label>
+          <div id="cad-erro" style="display:none;margin-bottom:12px"></div>
+          <div class="flex gap-2">
+            <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="voltarEtapa(2)">← Voltar</button>
+            <button class="btn btn-gold" style="flex:2;justify-content:center" onclick="finalizarCadastro()">✅ Criar conta</button>
+          </div>
+        </div>
+
       </div>
+    </div>
 
-      <div class="form-group" style="margin-top:14px">
-        <label class="form-label">Senha <span>*</span></label>
-        <input type="password" class="form-control" placeholder="••••••••" value="12345678">
-      </div>
+    <!-- ── TELA 3: SUCESSO ───────────────────────────────── -->
+    <div class="screen" id="screen-sucesso">
+      <div class="login-form-box" style="text-align:center">
+        <div class="success-icon">🎉</div>
+        <h2 style="margin-bottom:8px">Conta criada!</h2>
+        <p style="margin-bottom:4px">Bem-vindo(a) ao BuffetAuto,</p>
+        <p style="font-weight:600;color:var(--green-700);font-size:1rem;margin-bottom:0" id="sucesso-nome">—</p>
+        <p style="font-size:.83rem;color:var(--text-muted);margin-top:4px" id="sucesso-empresa">—</p>
 
-      <p class="login-forgot"><a href="#">Esqueci minha senha</a></p>
+        <div style="margin:24px 0;padding:16px;background:var(--green-100);border-radius:12px;text-align:left">
+          <div style="font-size:.8rem;font-weight:600;color:var(--green-700);margin-bottom:10px">✅ O que foi criado</div>
+          <div style="display:flex;flex-direction:column;gap:8px;font-size:.83rem;color:var(--text-secondary)">
+            <span>🏢 Conta corporativa ativa</span>
+            <span>📧 E-mail de boas-vindas enviado</span>
+            <span>🎁 14 dias de trial gratuito ativados</span>
+            <span>🔐 Acesso liberado ao painel</span>
+          </div>
+        </div>
 
-      <button class="btn btn-primary login-submit" style="margin-top:20px"
-        onclick="window.location.href='index.html'">
-        Entrar no sistema
-      </button>
+        <p style="font-size:.82rem;color:var(--text-muted);margin-bottom:4px">Redirecionando para o login em</p>
+        <span id="redirect-count">5</span>
+        <p style="font-size:.75rem;color:var(--text-muted)">segundos</p>
 
-      <div class="login-divider" style="margin-top:20px">ou</div>
-
-      <div style="display:flex;gap:8px;margin-top:4px">
-        <button class="btn btn-outline w-full" style="justify-content:center;font-size:.82rem">
-          🏢 Login Corporativo
+        <button class="btn btn-primary w-full" style="justify-content:center;margin-top:16px" onclick="irParaLoginComDados()">
+          Ir para o login agora →
         </button>
       </div>
-
-      <p style="text-align:center;font-size:.75rem;color:var(--text-muted);margin-top:28px">
-        Ao acessar, você concorda com nossa <a href="#" style="color:var(--green-500)">Política de Privacidade</a> e os <a href="#" style="color:var(--green-500)">Termos de Uso</a>.
-      </p>
     </div>
-  </div>
+
+  </div><!-- fim login-form-side -->
 </div>
+
+<script>
+// ── Dados temporários do cadastro ────────────────────────────
+let dadosCadastro = {};
+let countdownTimer = null;
+let etapaAtual = 1;
+
+// ── Navegação entre telas ─────────────────────────────────────
+function goTo(screenId, artId) {
+  // Anima saída da tela atual
+  const ativa = document.querySelector('.screen.active');
+  if (ativa) {
+    ativa.classList.add('leaving');
+    setTimeout(() => { ativa.classList.remove('active', 'leaving'); }, 250);
+  }
+  // Entra na nova tela
+  setTimeout(() => {
+    document.getElementById(screenId).classList.add('active');
+  }, 200);
+
+  // Troca arte lateral
+  document.querySelectorAll('.art-slide').forEach(a => a.classList.remove('active'));
+  document.getElementById(artId).classList.add('active');
+}
+
+function irParaCadastro() {
+  etapaAtual = 1;
+  resetarEtapas();
+  goTo('screen-cadastro', 'art-cadastro');
+}
+
+function irParaLogin() {
+  goTo('screen-login', 'art-login');
+}
+
+function irParaLoginComDados() {
+  clearInterval(countdownTimer);
+  // Preenche o campo de e-mail com o e-mail cadastrado
+  if (dadosCadastro.email) {
+    setTimeout(() => {
+      const el = document.getElementById('login-email');
+      if (el) el.value = dadosCadastro.email;
+    }, 300);
+  }
+  goTo('screen-login', 'art-login');
+}
+
+// ── Login ─────────────────────────────────────────────────────
+function tentarLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const senha  = document.getElementById('login-senha').value;
+  const erro   = document.getElementById('login-erro');
+
+  if (!email || !senha) {
+    mostrarErroLogin('Preencha e-mail e senha para continuar.'); return;
+  }
+
+  // Demo: aceita qualquer combinação ou os dados cadastrados
+  const emailValido   = email === 'gestor@buffetauto.com.br' || email === dadosCadastro.email;
+  const senhaValida   = senha  === '12345678'                || senha  === dadosCadastro.senha;
+
+  if (emailValido && senhaValida) {
+    erro.style.display = 'none';
+    // Feedback visual antes de redirecionar
+    const btn = document.querySelector('#screen-login .btn-primary');
+    btn.textContent = '✅ Entrando…';
+    btn.disabled = true;
+    btn.style.background = 'var(--green-500)';
+    setTimeout(() => { window.location.href = '../index.html'; }, 800);
+  } else {
+    mostrarErroLogin('E-mail ou senha inválidos. Tente: gestor@buffetauto.com.br / 12345678');
+  }
+}
+
+function mostrarErroLogin(msg) {
+  const erro = document.getElementById('login-erro');
+  erro.style.display = 'flex';
+  erro.className = 'alert alert-warning';
+  erro.style.marginTop = '12px';
+  erro.style.gap = '8px';
+  erro.innerHTML = `<span>⚠️</span><span>${msg}</span>`;
+}
+
+function mostrarEsqueciSenha(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const msg = email
+    ? `Se o e-mail <strong>${email}</strong> estiver cadastrado, você receberá as instruções em breve.`
+    : 'Informe seu e-mail no campo acima e tente novamente.';
+  mostrarErroLogin(msg);
+  document.getElementById('login-erro').className = 'alert alert-info';
+  document.getElementById('login-erro').style.marginTop = '12px';
+}
+
+// ── Etapas do cadastro ────────────────────────────────────────
+function resetarEtapas() {
+  [1,2,3].forEach(n => {
+    document.getElementById(`cad-step-${n}`).classList.remove('active');
+    document.getElementById(`step-c${n}`).className = 'step-circle';
+    document.getElementById(`step-l${n}`).className = 'step-label';
+  });
+  [1,2].forEach(n => document.getElementById(`step-line-${n}`).classList.remove('done'));
+  document.getElementById('cad-step-1').classList.add('active');
+  document.getElementById('step-c1').classList.add('active');
+  document.getElementById('step-l1').classList.add('active');
+}
+
+function atualizarBarraEtapas(etapa) {
+  [1,2,3].forEach(n => {
+    const c = document.getElementById(`step-c${n}`);
+    const l = document.getElementById(`step-l${n}`);
+    c.className = 'step-circle' + (n < etapa ? ' done' : n === etapa ? ' active' : '');
+    l.className  = 'step-label'  + (n < etapa ? ' done' : n === etapa ? ' active' : '');
+    if (n < etapa) { c.textContent = '✓'; } else { c.textContent = n; }
+  });
+  [1,2].forEach(n => {
+    document.getElementById(`step-line-${n}`).classList.toggle('done', n < etapa);
+  });
+}
+
+function avancarEtapa(proxima) {
+  // Validações por etapa
+  if (proxima === 2) {
+    const empresa = document.getElementById('cad-empresa').value.trim();
+    const cnpj    = document.getElementById('cad-cnpj').value.trim();
+    const cidade  = document.getElementById('cad-cidade').value.trim();
+    if (!empresa || !cnpj || !cidade) {
+      shakeForm('cad-step-1');
+      showToastLocal('Preencha todos os campos obrigatórios.', 'error'); return;
+    }
+    if (cnpj.replace(/\D/g,'').length < 14) {
+      showToastLocal('CNPJ inválido — preencha os 14 dígitos.', 'error'); return;
+    }
+    dadosCadastro.empresa  = empresa;
+    dadosCadastro.cnpj     = cnpj;
+    dadosCadastro.cidade   = cidade;
+    dadosCadastro.segmento = document.getElementById('cad-segmento').value;
+  }
+
+  if (proxima === 3) {
+    const nome = document.getElementById('cad-nome').value.trim();
+    const cpf  = document.getElementById('cad-cpf').value.trim();
+    const tel  = document.getElementById('cad-tel').value.trim();
+    if (!nome || !cpf || !tel) {
+      shakeForm('cad-step-2');
+      showToastLocal('Preencha todos os campos obrigatórios.', 'error'); return;
+    }
+    dadosCadastro.nome  = nome;
+    dadosCadastro.cpf   = cpf;
+    dadosCadastro.tel   = tel;
+    dadosCadastro.cargo = document.getElementById('cad-cargo').value;
+  }
+
+  // Anima saída da etapa atual
+  const atual = document.getElementById(`cad-step-${proxima - 1}`);
+  atual.style.animation = 'screenOut .2s ease forwards';
+  setTimeout(() => {
+    atual.classList.remove('active');
+    atual.style.animation = '';
+    document.getElementById(`cad-step-${proxima}`).classList.add('active');
+    etapaAtual = proxima;
+    atualizarBarraEtapas(proxima);
+  }, 200);
+}
+
+function voltarEtapa(anterior) {
+  const atual = document.getElementById(`cad-step-${etapaAtual}`);
+  atual.classList.remove('active');
+  document.getElementById(`cad-step-${anterior}`).classList.add('active');
+  etapaAtual = anterior;
+  atualizarBarraEtapas(anterior);
+}
+
+function finalizarCadastro() {
+  const email  = document.getElementById('cad-email').value.trim();
+  const senha  = document.getElementById('cad-senha').value;
+  const senha2 = document.getElementById('cad-senha2').value;
+  const termos = document.getElementById('cad-termos').checked;
+  const erroEl = document.getElementById('cad-erro');
+
+  const mostrarErroCad = (msg) => {
+    erroEl.style.display = 'flex';
+    erroEl.className = 'alert alert-warning';
+    erroEl.style.gap = '8px';
+    erroEl.innerHTML = `<span>⚠️</span><span>${msg}</span>`;
+    shakeForm('cad-step-3');
+  };
+
+  if (!email) { mostrarErroCad('Informe o e-mail de acesso.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { mostrarErroCad('E-mail inválido.'); return; }
+  if (senha.length < 8) { mostrarErroCad('A senha deve ter ao mínimo 8 caracteres.'); return; }
+  if (senha !== senha2) { mostrarErroCad('As senhas não coincidem.'); return; }
+  if (!termos) { mostrarErroCad('Aceite os termos para continuar.'); return; }
+
+  erroEl.style.display = 'none';
+  dadosCadastro.email = email;
+  dadosCadastro.senha = senha;
+
+  // Feedback no botão
+  const btn = document.querySelector('#cad-step-3 .btn-gold');
+  btn.textContent = '⏳ Criando conta…';
+  btn.disabled = true;
+
+  // Simula processamento (1.2s)
+  setTimeout(() => {
+    btn.textContent = '✅ Criar conta';
+    btn.disabled = false;
+    irParaSucesso();
+  }, 1200);
+}
+
+// ── Tela de sucesso ───────────────────────────────────────────
+function irParaSucesso() {
+  document.getElementById('sucesso-nome').textContent    = dadosCadastro.nome    || '—';
+  document.getElementById('sucesso-empresa').textContent = dadosCadastro.empresa || '—';
+
+  goTo('screen-sucesso', 'art-sucesso');
+
+  // Contador regressivo
+  let count = 5;
+  document.getElementById('redirect-count').textContent = count;
+  countdownTimer = setInterval(() => {
+    count--;
+    document.getElementById('redirect-count').textContent = count;
+    if (count <= 0) {
+      clearInterval(countdownTimer);
+      irParaLoginComDados();
+    }
+  }, 1000);
+}
+
+// ── Força da senha ────────────────────────────────────────────
+function avaliarSenha(val) {
+  const fill = document.getElementById('pwd-fill');
+  const hint = document.getElementById('pwd-hint');
+  let score = 0;
+  if (val.length >= 8)  score++;
+  if (val.length >= 12) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+
+  const levels = [
+    { pct:'0%',   bg:'var(--border)',   label:'Digite a senha para ver a força' },
+    { pct:'20%',  bg:'var(--danger)',   label:'⚠️ Muito fraca' },
+    { pct:'40%',  bg:'#E67E22',         label:'🔶 Fraca' },
+    { pct:'60%',  bg:'var(--warning)',  label:'🟡 Razoável' },
+    { pct:'80%',  bg:'var(--green-500)',label:'🟢 Boa' },
+    { pct:'100%', bg:'var(--green-700)',label:'💪 Excelente' },
+  ];
+  const l = levels[Math.min(score, 5)];
+  fill.style.width      = val.length ? l.pct : '0%';
+  fill.style.background = l.bg;
+  hint.textContent      = val.length ? l.label : levels[0].label;
+  hint.style.color      = val.length ? l.bg : 'var(--text-muted)';
+}
+
+// ── Toggle visibilidade de senha ──────────────────────────────
+function togglePwd(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁️';
+  }
+}
+
+// ── Máscaras ──────────────────────────────────────────────────
+function maskCNPJ(v) {
+  return v.replace(/\D/g,'').slice(0,14)
+    .replace(/^(\d{2})(\d)/,'$1.$2')
+    .replace(/^(\d{2})\.(\d{3})(\d)/,'$1.$2.$3')
+    .replace(/\.(\d{3})(\d)/,'.$1/$2')
+    .replace(/(\d{4})(\d)/,'$1-$2');
+}
+function maskCPF(v) {
+  return v.replace(/\D/g,'').slice(0,11)
+    .replace(/(\d{3})(\d)/,'$1.$2')
+    .replace(/(\d{3})\.(\d{3})(\d)/,'$1.$2.$3')
+    .replace(/\.(\d{3})(\d{1,2})$/,'.$1-$2');
+}
+function maskTel(v) {
+  const d = v.replace(/\D/g,'').slice(0,11);
+  if (d.length <= 10) return d.replace(/^(\d{2})(\d{4})(\d{0,4})/,'($1) $2-$3');
+  return d.replace(/^(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
+}
+
+// ── Shake de validação ────────────────────────────────────────
+function shakeForm(stepId) {
+  const el = document.getElementById(stepId);
+  el.style.animation = 'none'; el.offsetHeight;
+  el.style.animation = 'shake .4s ease';
+}
+
+// ── Toast local (sem depender do app.js) ──────────────────────
+function showToastLocal(msg, type='success') {
+  document.querySelectorAll('.toast-local').forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast-local';
+  t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;
+    background:${type==='success'?'var(--green-900)':'#C0392B'};
+    color:#fff;padding:12px 20px;border-radius:10px;font-size:.87rem;
+    box-shadow:0 12px 40px rgba(27,46,31,.16);display:flex;align-items:center;gap:10px;
+    animation:fadeUp .3s ease;max-width:320px;`;
+  t.innerHTML = `<span>${type==='success'?'✅':'❌'}</span><span>${msg}</span>`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+</script>
+
+<style>
+/* Shake animation para validação */
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+/* fadeUp para toast local */
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(16px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+/* Login form side permite scrolling em mobile */
+.login-form-side { overflow-y: auto; }
+</style>
+
 </body>
 </html>
